@@ -1800,3 +1800,23 @@ constantTimeEquals <- function(raw1, raw2) {
 
   sum(as.integer(xor(raw1, raw2))) == 0
 }
+
+# Runs Shiny app only in interactive session, and
+# takes a screenshot if run in pkgdown.
+
+shinyExampleApp <- function(ui, server) {
+  if (interactive()) {
+    options(device.ask.default = FALSE)
+    shinyApp(ui, server)
+  }
+
+  if (pkgdown::in_pkgdown()) {
+    # save to temp file
+    tmpfile <- tempfile(fileext = ".R")
+    cat(file = tmpfile, ui, server)
+
+    webshot::appshot(shinyApp(ui, server),
+                     "example_webshot.png"
+                     )
+  }
+}
